@@ -111,10 +111,6 @@ class BoardObserver
      */
     public function deleted($entity)
     {
-        if (!config('wk-morph-board.soft_delete')) {
-            $entity->forceDelete();
-        }
-
         if ($entity->isForceDeleting()) {
             $entity->langs()->withTrashed()
                             ->forceDelete();
@@ -122,20 +118,33 @@ class BoardObserver
                 config('wk-morph-board.onoff.morph-comment')
                 && !empty(config('wk-core.class.morph-comment.comment'))
             ) {
-                $entity->comments()->withTrashed()->forceDelete();
+                $records = $entity->comments()->withTrashed()->get();
+                foreach ($records as $recoed) {
+                    $recoed->forceDelete();
+                }
             }
             if (
                 config('wk-morph-board.onoff.morph-image')
                 && !empty(config('wk-core.class.morph-image.image'))
             ) {
-                $entity->images()->withTrashed()->forceDelete();
+                $records = $entity->images()->withTrashed()->get();
+                foreach ($records as $recoed) {
+                    $recoed->forceDelete();
+                }
             }
             if (
                 config('wk-morph-board.onoff.morph-link')
                 && !empty(config('wk-core.class.morph-link.link'))
             ) {
-                $entity->links()->withTrashed()->forceDelete();
+                $records = $entity->links()->withTrashed()->get();
+                foreach ($records as $recoed) {
+                    $recoed->forceDelete();
+                }
             }
+        }
+
+        if (!config('wk-morph-board.soft_delete')) {
+            $entity->forceDelete();
         }
     }
 
